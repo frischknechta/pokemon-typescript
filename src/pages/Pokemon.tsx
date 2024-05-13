@@ -1,7 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { pokemonSchema } from "../types";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 export const Pokemon = (): JSX.Element => {
   const { id } = useParams();
@@ -12,7 +13,7 @@ export const Pokemon = (): JSX.Element => {
     queryKey: ["pokemon", id],
     queryFn: async () => {
       const { data } = await axios.get(
-        `https://pokeapi.co/api/v2/pokemon/${id}`
+        `https://pokeapi.co/api/v2/pokemon/${id}`,
       );
       return pokemonSchema.parse(data);
     },
@@ -28,10 +29,14 @@ export const Pokemon = (): JSX.Element => {
   }
 
   return (
-    <div>
+    <main className="relative flex min-h-screen flex-col items-center justify-center gap-5 bg-red-500">
+      <Link to={"/"} className="absolute left-5 top-5 text-xl hover:text-white">
+        <FontAwesomeIcon icon="chevron-left" /> Go back to Pokemons list
+      </Link>
       <img src={data.sprites.front_default} alt={`A picture of ${data.name}`} />
-      <div>{data.name}</div>
-      <div>
+      <h1 className="text-4xl capitalize">{data.name}</h1>
+      <div className="text-2xl"># {data.id}</div>
+      <div className="flex gap-5">
         {data.types.map((type) => {
           return (
             <div key={type.type.name}>
@@ -45,16 +50,14 @@ export const Pokemon = (): JSX.Element => {
           );
         })}
       </div>
-      <div># {data.id}</div>
-      <div>Height: {data.height}</div>
-      <div>Weight: {data.weight}</div>
-      <div>Base experience: {data.base_experience}</div>
+      <div className="text-xl">HEIGHT: {data.height * 10} CM</div>
+      <div className="text-xl">WEIGHT: {data.weight / 10} KG</div>
       {data.cries?.latest ? (
-        <div>
-          Cry:
+        <div className="flex items-center gap-5 text-xl">
+          CRY:
           <audio controls src={data.cries.latest}></audio>
         </div>
       ) : null}
-    </div>
+    </main>
   );
 };
